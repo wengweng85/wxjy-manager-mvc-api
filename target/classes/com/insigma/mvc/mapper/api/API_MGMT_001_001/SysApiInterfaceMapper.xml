@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.insigma.mvc.dao.api.API_MGMT_001_001.SysApiInterfaceMapper">
+  
+  <resultMap id="BaseResultMap" type="SysApiInterface">
+	    <id column="INTERFACE_ID" jdbcType="VARCHAR" property="interfaceId" />
+	    <result column="INTERFACE_CODE" jdbcType="VARCHAR" property="interfaceCode" />
+	    <result column="INTERFACE_URL" jdbcType="VARCHAR" property="interfaceUrl" />
+	    <result column="INTERFACE_TYPE" jdbcType="VARCHAR" property="interfaceType" />
+	    <result column="INTERFACE_DETAIL_TYPE" jdbcType="VARCHAR" property="interfaceDetailType" /> 
+	    <result column="INTERFACE_NAME" jdbcType="VARCHAR" property="interfaceName" />
+	    <result column="ISOFFICAL" jdbcType="VARCHAR" property="isoffical" />
+	    <result column="INTERFACE_NETWORK" jdbcType="VARCHAR" property="interfaceNetwork" />
+	    <result column="INTERFACE_POTOCOL" jdbcType="VARCHAR" property="interfacePotocol" />
+	    <result column="INTERFACE_STATUS" jdbcType="VARCHAR" property="interfaceStatus" />
+	    <result column="USERID" jdbcType="VARCHAR" property="userid" />
+	    <result column="ADDTIME" jdbcType="DATE" property="addtime" />
+	    <result column="CHANNEL_ID" jdbcType="VARCHAR" property="channelId" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    INTERFACE_ID, INTERFACE_CODE, INTERFACE_URL, INTERFACE_TYPE,INTERFACE_DETAIL_TYPE, INTERFACE_NAME, ISOFFICAL, 
+    INTERFACE_NETWORK, INTERFACE_POTOCOL, INTERFACE_STATUS, USERID, ADDTIME
+  </sql>
+  
+  <sql id="Base_Column_List_Of_Name">
+    INTERFACE_ID, INTERFACE_CODE, INTERFACE_URL, 
+    (select aaa103 from v_aa10 t where t.aaa100='INTERFACE_TYPE' AND aaa102=INTERFACE_TYPE) INTERFACE_TYPE, 
+    (select aaa103 from v_aa10 t where t.aaa100='INTERFACE_TYPE' AND aaa102=INTERFACE_DETAIL_TYPE) INTERFACE_DETAIL_TYPE,  
+    INTERFACE_NAME, 
+    (select aaa103 from v_aa10 t where t.aaa100='YESNO' AND aaa102=ISOFFICAL) ISOFFICAL, 
+    (select aaa103 from v_aa10 t where t.aaa100='INTERFACE_NETWORK' AND aaa102=INTERFACE_NETWORK) INTERFACE_NETWORK, 
+    (select aaa103 from v_aa10 t where t.aaa100='INTERFACE_POTOCOL' AND aaa102=INTERFACE_POTOCOL) INTERFACE_POTOCOL, 
+    INTERFACE_STATUS, 
+    USERID, 
+    ADDTIME
+  </sql>
+  
+  
+  <!-- 服务列表查询 -->
+  <select id="getList" parameterType="SysApiInterface" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List_Of_Name" />
+    from SYS_API_INTERFACE
+     <where>
+      <if test="interfaceName!=null">
+        and INTERFACE_NAME like '%'||#{interfaceName}||'%' 
+      </if>
+      <if test="a_interfaceType!=null">
+        and interface_type in 
+        <foreach item="item" collection="a_interfaceType" open="(" separator="," close=")">
+            #{item}
+        </foreach> 
+      </if>
+      <if test="a_interfacePotocol!=null">
+        and interface_potocol in 
+        <foreach item="item" collection="a_interfacePotocol!=null" open="(" separator="," close=")">
+            #{item}
+        </foreach> 
+      </if>
+      
+      <if test="a_interfaceStatus!=null">
+        and interface_status in 
+        <foreach item="item" collection="a_interfaceStatus" open="(" separator="," close=")">
+            #{item}
+        </foreach> 
+      </if>
+      
+      <if test="a_interfaceNetwork!=null">
+        and interface_network in 
+        <foreach item="item" collection="a_interfaceNetwork" open="(" separator="," close=")">
+            #{item}
+        </foreach> 
+      </if>
+    </where>
+     order by ADDTIME desc 
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_API_INTERFACE
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByUrl" resultMap="BaseResultMap">
+   select 
+    a.INTERFACE_ID, 
+    a.INTERFACE_CODE, 
+    a.INTERFACE_URL, 
+    a.INTERFACE_TYPE,
+    a.INTERFACE_DETAIL_TYPE, 
+    a.INTERFACE_NAME, 
+    a.ISOFFICAL, 
+    a.INTERFACE_NETWORK, 
+    a.INTERFACE_POTOCOL, 
+    a.INTERFACE_STATUS, 
+    a.USERID, 
+    a.ADDTIME,
+    b.CHANNEL_ID
+    from SYS_API_INTERFACE a,SYS_API_CHANNEL b,sys_api_channel_interface c 
+    where a.interface_id=c.interface_id 
+    and b.channel_id=c.channel_id 
+    and c.isvalid='1'
+    and a.INTERFACE_STATUS='1'
+    and b.channel_status='1'
+    and regexp_like(#{url,jdbcType=VARCHAR},a.INTERFACE_URL ) and b.CHANNEL_APPKEY = #{appkey,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectNameByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List_Of_Name" />
+    from SYS_API_INTERFACE
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from SYS_API_INTERFACE
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="SysApiInterface">
+    <selectKey resultType="java.lang.String" order="BEFORE" keyProperty="interfaceId"> 
+        SELECT sys_guid() from dual 
+    </selectKey>
+    insert into SYS_API_INTERFACE (INTERFACE_ID, INTERFACE_CODE, INTERFACE_URL, 
+      INTERFACE_TYPE, INTERFACE_DETAIL_TYPE,INTERFACE_NAME, ISOFFICAL, 
+      INTERFACE_NETWORK, INTERFACE_POTOCOL, INTERFACE_STATUS, 
+      USERID, ADDTIME)
+    values (#{interfaceId,jdbcType=VARCHAR}, #{interfaceCode,jdbcType=VARCHAR}, #{interfaceUrl,jdbcType=VARCHAR}, 
+      #{interfaceType,jdbcType=VARCHAR}, #{interfaceDetailType,jdbcType=VARCHAR},#{interfaceName,jdbcType=VARCHAR}, #{isoffical,jdbcType=VARCHAR}, 
+      #{interfaceNetwork,jdbcType=VARCHAR}, #{interfacePotocol,jdbcType=VARCHAR}, '-1', 
+      #{userid,jdbcType=VARCHAR}, sysdate)
+  </insert>
+  
+  <insert id="insertSelective" parameterType="SysApiInterface">
+    <selectKey resultType="java.lang.String" order="BEFORE" keyProperty="interfaceId"> 
+        SELECT sys_guid() from dual 
+    </selectKey>
+    insert into SYS_API_INTERFACE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="interfaceId != null">
+        INTERFACE_ID,
+      </if>
+      <if test="interfaceCode != null">
+        INTERFACE_CODE,
+      </if>
+      <if test="interfaceUrl != null">
+        INTERFACE_URL,
+      </if>
+      <if test="interfaceType != null">
+        INTERFACE_TYPE,
+      </if>
+      <if test="interfaceDetailType != null">
+        INTERFACE_DETAIL_TYPE,
+      </if>
+      <if test="interfaceName != null">
+        INTERFACE_NAME,
+      </if>
+      <if test="isoffical != null">
+        ISOFFICAL,
+      </if>
+      <if test="interfaceNetwork != null">
+        INTERFACE_NETWORK,
+      </if>
+      <if test="interfacePotocol != null">
+        INTERFACE_POTOCOL,
+      </if>
+      <if test="interfaceStatus != null">
+        INTERFACE_STATUS,
+      </if>
+      <if test="userid != null">
+        USERID,
+      </if>
+      <if test="addtime != null">
+        ADDTIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="interfaceId != null">
+        #{interfaceId,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceCode != null">
+        #{interfaceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceUrl != null">
+        #{interfaceUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceType != null">
+        #{interfaceType,jdbcType=VARCHAR},
+      </if>
+       <if test="interfaceDetailType != null">
+         #{interfaceDetailType,jdbcType=VARCHAR},
+        </if>
+      <if test="interfaceName != null">
+        #{interfaceName,jdbcType=VARCHAR},
+      </if>
+      <if test="isoffical != null">
+        #{isoffical,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceNetwork != null">
+        #{interfaceNetwork,jdbcType=VARCHAR},
+      </if>
+      <if test="interfacePotocol != null">
+        #{interfacePotocol,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceStatus != null">
+        #{interfaceStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        #{addtime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="SysApiInterface">
+    update SYS_API_INTERFACE
+    <set>
+      <if test="interfaceCode != null">
+        INTERFACE_CODE = #{interfaceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceUrl != null">
+        INTERFACE_URL = #{interfaceUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceType != null">
+        INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceDetailType != null">
+        INTERFACE_DETAIL_TYPE = #{interfaceDetailType,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceName != null">
+        INTERFACE_NAME = #{interfaceName,jdbcType=VARCHAR},
+      </if>
+      <if test="isoffical != null">
+        ISOFFICAL = #{isoffical,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceNetwork != null">
+        INTERFACE_NETWORK = #{interfaceNetwork,jdbcType=VARCHAR},
+      </if>
+      <if test="interfacePotocol != null">
+        INTERFACE_POTOCOL = #{interfacePotocol,jdbcType=VARCHAR},
+      </if>
+      <if test="interfaceStatus != null">
+        INTERFACE_STATUS = #{interfaceStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        USERID = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        ADDTIME = #{addtime,jdbcType=DATE},
+      </if>
+    </set>
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="SysApiInterface">
+    update SYS_API_INTERFACE
+    set INTERFACE_CODE = #{interfaceCode,jdbcType=VARCHAR},
+      INTERFACE_URL = #{interfaceUrl,jdbcType=VARCHAR},
+      INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR},
+      INTERFACE_DETAIL_TYPE = #{interfaceDetailType,jdbcType=VARCHAR},
+      INTERFACE_NAME = #{interfaceName,jdbcType=VARCHAR},
+      ISOFFICAL = #{isoffical,jdbcType=VARCHAR},
+      INTERFACE_NETWORK = #{interfaceNetwork,jdbcType=VARCHAR},
+      INTERFACE_POTOCOL = #{interfacePotocol,jdbcType=VARCHAR},
+      INTERFACE_STATUS = #{interfaceStatus,jdbcType=VARCHAR},
+      USERID = #{userid,jdbcType=VARCHAR},
+      ADDTIME = #{addtime,jdbcType=DATE}
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </update>
+</mapper>

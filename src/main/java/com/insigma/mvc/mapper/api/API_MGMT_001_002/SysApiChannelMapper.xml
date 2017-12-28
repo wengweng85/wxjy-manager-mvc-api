@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.insigma.mvc.dao.api.API_MGMT_001_002.SysApiChannelMapper">
+  <resultMap id="BaseResultMap" type="com.insigma.mvc.model.SysApiChannel">
+    <id column="CHANNEL_ID" jdbcType="VARCHAR" property="channelId" />
+    <result column="CHANNEL_CODE" jdbcType="VARCHAR" property="channelCode" />
+    <result column="CHANNEL_NAME" jdbcType="VARCHAR" property="channelName" />
+    <result column="CHANNEL_TYPE" jdbcType="VARCHAR" property="channelType" />
+    <result column="CHANNEL_DESCRIBE" jdbcType="VARCHAR" property="channelDescribe" />
+    <result column="CHANNEL_ICON" jdbcType="VARCHAR" property="channelIcon" />
+    <result column="CHANNEL_STATUS" jdbcType="VARCHAR" property="channelStatus" />
+    <result column="USERID" jdbcType="VARCHAR" property="userid" />
+    <result column="ADDTIME" jdbcType="DATE" property="addtime" />
+    <result column="AUDITID" jdbcType="VARCHAR" property="auditid" />
+    <result column="AUDITTIME" jdbcType="DATE" property="audittime" />
+    <result column="CHANNEL_APPKEY" jdbcType="VARCHAR" property="channelAppkey" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    CHANNEL_ID, CHANNEL_CODE, CHANNEL_NAME, CHANNEL_TYPE, CHANNEL_DESCRIBE, CHANNEL_ICON, 
+    CHANNEL_STATUS, USERID, ADDTIME, AUDITID, AUDITTIME, CHANNEL_APPKEY
+  </sql>
+  
+    <sql id="Base_Column_List_Of_Name">
+    CHANNEL_ID, CHANNEL_CODE, CHANNEL_NAME, 
+    (select aaa103 from v_aa10 t where t.aaa100='CHANNEL_TYPE' AND aaa102=CHANNEL_TYPE) CHANNEL_TYPE, 
+    CHANNEL_DESCRIBE, 
+    CHANNEL_ICON, 
+    CHANNEL_STATUS,
+    USERID, ADDTIME, AUDITID, AUDITTIME,CHANNEL_APPKEY
+  </sql>
+  
+  <!-- 服务列表查询 -->
+  <select id="getList" parameterType="SysApiChannel" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List_Of_Name" />
+    from SYS_API_CHANNEL
+     <where>
+      <if test="channelName!=null">
+        and CHANNEL_NAME like '%'||#{channelName}||'%' 
+      </if>
+      <if test="a_channelType!=null">
+        and CHANNEL_TYPE in 
+        <foreach item="item" collection="a_channelType" open="(" separator="," close=")">
+            #{item}
+        </foreach> 
+      </if>
+      <if test="a_channelStatus!=null">
+        and CHANNEL_STATUS in 
+        <foreach item="item" collection="a_channelStatus!=null" open="(" separator="," close=")">
+            #{item}
+        </foreach> 
+      </if>
+    </where>
+    order by ADDTIME desc 
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_API_CHANNEL
+    where CHANNEL_ID = #{channelId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectDataByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List_Of_Name" />
+    from SYS_API_CHANNEL
+    where CHANNEL_ID = #{channelId,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from SYS_API_CHANNEL
+    where CHANNEL_ID = #{channelId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.insigma.mvc.model.SysApiChannel">
+    <selectKey resultType="java.lang.String" order="BEFORE" keyProperty="channelId"> 
+        SELECT sys_guid() from dual 
+    </selectKey>
+    insert into SYS_API_CHANNEL (CHANNEL_ID, CHANNEL_CODE, CHANNEL_NAME, 
+      CHANNEL_TYPE, CHANNEL_DESCRIBE, CHANNEL_ICON, 
+      CHANNEL_STATUS, USERID, ADDTIME, 
+      AUDITID, AUDITTIME, CHANNEL_APPKEY
+      )
+    values (#{channelId,jdbcType=VARCHAR}, #{channelCode,jdbcType=VARCHAR}, #{channelName,jdbcType=VARCHAR}, 
+      #{channelType,jdbcType=VARCHAR}, #{channelDescribe,jdbcType=VARCHAR}, #{channelIcon,jdbcType=VARCHAR}, 
+      #{channelStatus,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{addtime,jdbcType=DATE}, 
+      #{auditid,jdbcType=VARCHAR}, #{audittime,jdbcType=DATE}, #{channelAppkey,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.insigma.mvc.model.SysApiChannel">
+    <selectKey resultType="java.lang.String" order="BEFORE" keyProperty="channelId"> 
+        SELECT sys_guid() from dual 
+    </selectKey>
+    insert into SYS_API_CHANNEL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="channelId != null">
+        CHANNEL_ID,
+      </if>
+      <if test="channelCode != null">
+        CHANNEL_CODE,
+      </if>
+      <if test="channelName != null">
+        CHANNEL_NAME,
+      </if>
+      <if test="channelType != null">
+        CHANNEL_TYPE,
+      </if>
+      <if test="channelDescribe != null">
+        CHANNEL_DESCRIBE,
+      </if>
+      <if test="channelIcon != null">
+        CHANNEL_ICON,
+      </if>
+      <if test="channelStatus != null">
+        CHANNEL_STATUS,
+      </if>
+      <if test="userid != null">
+        USERID,
+      </if>
+      <if test="addtime != null">
+        ADDTIME,
+      </if>
+      <if test="auditid != null">
+        AUDITID,
+      </if>
+      <if test="audittime != null">
+        AUDITTIME,
+      </if>
+      <if test="channelAppkey != null">
+        CHANNEL_APPKEY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="channelId != null">
+        #{channelId,jdbcType=VARCHAR},
+      </if>
+      <if test="channelCode != null">
+        #{channelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelName != null">
+        #{channelName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelType != null">
+        #{channelType,jdbcType=VARCHAR},
+      </if>
+      <if test="channelDescribe != null">
+        #{channelDescribe,jdbcType=VARCHAR},
+      </if>
+      <if test="channelIcon != null">
+        #{channelIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="channelStatus != null">
+        #{channelStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        #{addtime,jdbcType=DATE},
+      </if>
+      <if test="auditid != null">
+        #{auditid,jdbcType=VARCHAR},
+      </if>
+      <if test="audittime != null">
+        #{audittime,jdbcType=DATE},
+      </if>
+      <if test="channelAppkey != null">
+        #{channelAppkey,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.insigma.mvc.model.SysApiChannel">
+    update SYS_API_CHANNEL
+    <set>
+      <if test="channelCode != null">
+        CHANNEL_CODE = #{channelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelName != null">
+        CHANNEL_NAME = #{channelName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelType != null">
+        CHANNEL_TYPE = #{channelType,jdbcType=VARCHAR},
+      </if>
+      <if test="channelDescribe != null">
+        CHANNEL_DESCRIBE = #{channelDescribe,jdbcType=VARCHAR},
+      </if>
+      <if test="channelIcon != null">
+        CHANNEL_ICON = #{channelIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="channelStatus != null">
+        CHANNEL_STATUS = #{channelStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        USERID = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        ADDTIME = #{addtime,jdbcType=DATE},
+      </if>
+      <if test="auditid != null">
+        AUDITID = #{auditid,jdbcType=VARCHAR},
+      </if>
+      <if test="audittime != null">
+        AUDITTIME = #{audittime,jdbcType=DATE},
+      </if>
+      <if test="channelAppkey != null">
+        CHANNEL_APPKEY = #{channelAppkey,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CHANNEL_ID = #{channelId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.insigma.mvc.model.SysApiChannel">
+    update SYS_API_CHANNEL
+    set CHANNEL_CODE = #{channelCode,jdbcType=VARCHAR},
+      CHANNEL_NAME = #{channelName,jdbcType=VARCHAR},
+      CHANNEL_TYPE = #{channelType,jdbcType=VARCHAR},
+      CHANNEL_DESCRIBE = #{channelDescribe,jdbcType=VARCHAR},
+      CHANNEL_ICON = #{channelIcon,jdbcType=VARCHAR},
+      CHANNEL_STATUS = #{channelStatus,jdbcType=VARCHAR},
+      USERID = #{userid,jdbcType=VARCHAR},
+      ADDTIME = #{addtime,jdbcType=DATE},
+      AUDITID = #{auditid,jdbcType=VARCHAR},
+      AUDITTIME = #{audittime,jdbcType=DATE},
+      CHANNEL_APPKEY = #{channelAppkey,jdbcType=VARCHAR}
+    where CHANNEL_ID = #{channelId,jdbcType=VARCHAR}
+  </update>
+  
+  <!--获取权限树  -->
+  <select id="getApiInterfaceTree"  resultType="SysApiInterface"  parameterType="String" >
+	select code_value id, code_name name, a.par_code_value pid, decode(sign((select count(*)
+                     from sys_api_channel_interface t
+                    where t.channel_id  = #{channelid}
+                      and t.interface_id = a.code_value)),
+              '1',
+              'true',
+              'false') checked 
+    from code_value a
+    where a.code_type = 'INTERFACE_TYPE'
+    union all
+    select interface_id id,
+       interface_name ||'('|| interface_url||')' name  ,
+       interface_detail_type pid,
+       decode(sign((select count(*)
+                     from sys_api_channel_interface t
+                    where t.channel_id  = #{channelid}
+                      and t.interface_id = a.interface_id)),
+              '1',
+              'true',
+              'false') checked
+  from sys_api_interface a
+  </select>
+  
+  <delete id="deleteChannelInterfaceByChannelId" parameterType="String">
+     delete from SYS_API_CHANNEL_INTERFACE t where t.CHANNEL_ID=#{CHANNEL_ID}
+  </delete>
+  
+  <!-- 批量保存 -->
+  <insert id="batIinsertChannelInterface"  parameterType="java.util.List">  
+    insert into SYS_API_CHANNEL_INTERFACE (CHANNEL_INTERFACE_ID,CHANNEL_ID,INTERFACE_ID,USERID,ADDTIME,ISVALID)   
+    <foreach collection="list" item="item" index="index" separator="union all" >
+      (select sys_guid(),#{item.channelId},#{item.interfaceId},#{item.userid},#{item.addtime,jdbcType=DATE},#{item.isvalid} from dual)
+    </foreach>
+  </insert>   
+  
+  
+  <select id="getApiChannelByAppkey" parameterType="java.lang.String" resultMap="BaseResultMap">
+   select 
+    <include refid="Base_Column_List" />
+    from SYS_API_CHANNEL
+    where CHANNEL_APPKEY = #{channelAppkey,jdbcType=VARCHAR}
+  
+  </select>
+</mapper>
